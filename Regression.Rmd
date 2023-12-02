@@ -1,0 +1,230 @@
+---
+title: "Regression"
+author: "POLI3148 Group"
+date: "2023-12-01"
+output:
+  html_document:
+    df_print: paged
+editor_options: 
+  chunk_output_type: console
+---
+
+#Default
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+#Input
+
+##Libraries:
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+##Read in independent variables and get a summary:
+
+```{r}
+Dem_index <- read.csv("data/vdem_1984_2022_index.csv")
+View(Dem_index)
+summary(Dem_index)
+```
+
+##Read in dependent variables and ensure correct type for variables:
+
+```{r}
+Edu_as_of_G <- read_excel("data/Expenditure_on_Education_as_of_Total_Government_Expenditure.xlsx", col_types = c("guess", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
+View(Edu_as_of_G)
+
+G_as_of_Y <- read_excel("data/Government_Expenditure_as_of_GDP.xlsx",  col_types = c("guess", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric"))
+View(G_as_of_Y)
+```
+
+#Data Wrangling
+
+##Independent variable(s): Dem_index
+
+###Libraries:
+
+```{r}
+library(dplyr)
+```
+
+###Rename:
+
+```{r}
+Dem_index <-
+  Dem_index |>
+  rename(Electoral = v2x_polyarchy, Liberal = v2x_libdem, Participatory = v2x_partipdem, Deliberative = v2x_delibdem, Egalitarian = v2x_egaldem) |>
+  rename(Country = country_name, Year = year)
+```
+
+###Get necessary data:
+
+```{r}
+Dem_index_cleaned <-
+  Dem_index |>
+  select(Country, Year, Electoral, Liberal, Participatory, Deliberative, Egalitarian) |>
+  filter(Year > 2013, Year < 2020)
+View(Dem_index_cleaned)
+```
+
+###Sort the data into different tables:
+
+```{r}
+Dem_Electoral <-
+  Dem_index_cleaned |>
+  select(Country, Year, Electoral) |>
+  pivot_wider(names_from = Year, values_from = Electoral) |>
+  arrange(Country) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+
+Dem_Liberal <-
+  Dem_index_cleaned |>
+  select(Country, Year, Liberal) |>
+  pivot_wider(names_from = Year, values_from = Liberal) |>
+  arrange(Country) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+
+Dem_Participatory <-
+  Dem_index_cleaned |>
+  select(Country, Year, Participatory) |>
+  pivot_wider(names_from = Year, values_from = Participatory) |>
+  arrange(Country) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+
+Dem_Deliberative <-
+  Dem_index_cleaned |>
+  select(Country, Year, Deliberative) |>
+  pivot_wider(names_from = Year, values_from = Deliberative) |>
+  arrange(Country) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+
+Dem_Egalitarian <-
+  Dem_index_cleaned |>
+  select(Country, Year, Egalitarian) |>
+  pivot_wider(names_from = Year, values_from = Egalitarian) |>
+  arrange(Country) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+```
+
+##Dependent variables: Edu_as_of_G, G_as_of_Y
+
+###Arrange Edu_as_of_G:
+
+####Rename:
+
+```{r}
+Edu_as_of_G <-
+  Edu_as_of_G |>
+  rename(Country = ...1)
+```
+
+####Sort out unwanted data:
+
+```{r}
+Edu_as_of_G_cleaned <-
+  Edu_as_of_G |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+```
+
+###Arrange G_as_of_Edu:
+
+####Rename:
+
+```{r}
+G_as_of_Y <-
+  G_as_of_Y |>
+  rename(Country = ...1)
+```
+
+####Sort out unwanted data:
+
+```{r}
+G_as_of_Y_cleaned <-
+  G_as_of_Y |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7)
+```
+
+#Data Analysis
+
+##Join the variables from both sides
+
+###Use G_as_of_Y and Dem_Electoral of the Year 2014 as an example:
+
+```{r}
+G_as_of_Y_cleaned_test <-
+  G_as_of_Y_cleaned |>
+  mutate(Country_t = Country, Year_t_x = Twenty_fourteen) |>
+  select(Country_t, Year_t_x) 
+
+Dem_Electoral_test <-
+  Dem_Electoral |>
+  mutate(Country_t = Country, Year_t_y = Twenty_fourteen) |>
+  select(Country_t, Year_t_y)
+
+Test1 <- 
+  full_join(G_as_of_Y_cleaned_test, Dem_Electoral_test)
+
+##VERY IMPORTANT NOTE: Our dataset lacks too much percentage of data:
+
+is.na(Test1) |> sum()
+
+##ONE POSSIBLE SOLUTION: Use data from 2014-2019 as a whole to avoid lack in data.
+##ONE STRONG OBJECTION: The availability of data is still not changed.
+```
+
+###Another attempt (Edu_as_of_G and Dem_Electoral of the Year 2014):
+
+```{r}
+Edu_as_of_G_cleaned_test <-
+  Edu_as_of_G_cleaned |>
+  mutate(Country_t = Country, Year_t_x = Twenty_fourteen) |>
+  select(Country_t, Year_t_x) 
+
+Dem_Electoral_test <-
+  Dem_Electoral |>
+  mutate(Country_t = Country, Year_t_y = Twenty_fourteen) |>
+  select(Country_t, Year_t_y)
+
+Test2 <- 
+  full_join(Edu_as_of_G_cleaned_test, Dem_Electoral_test)
+```
+
+##Find numerical correlations
+
+```{r}
+
+#Example cont`d: Find numerical correlations: (This part has not been finished)
+
+#model <- lm(Year_t_y ~ Year_t_x, data = Test)
+#view(model)
+```
+
+#Data Visualization
+
+```{r}
+
+theme_set(theme_bw())
+#NOT CORRECT: library(ggplot)
+
+#Example cont`d: Plot a graph:
+
+Test1 |> 
+  ggplot(aes(x = Year_t_x, y = Year_t_y)) + 
+  geom_point() + 
+  labs(x = "Government expenditure as of GDP", y = "Electoral Democracy Index", 
+       title = "Government expenditure as of GDP and Electoral Democracy Level (2014)",
+       caption = "By Yueling Xu, Data source: V-Dem v.13, Word Bank")
+
+Test2 |> 
+  ggplot(aes(x = Year_t_x, y = Year_t_y)) + 
+  geom_point() + 
+  labs(x = "Education expenditure as of government expenditure", y = "Electoral Democracy Index", 
+       title = "Education expenditure as of government expenditure and Electoral Democracy Level (2014)",
+       caption = "By Yueling Xu, Data source: V-Dem v.13, Word Bank")
+```
