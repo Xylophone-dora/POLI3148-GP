@@ -29,6 +29,7 @@ sf_use_s2(FALSE)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(ggthemes)
+library(viridis)
 ```
 
 ##Read in independent variables:
@@ -624,4 +625,246 @@ d |>
   theme_classic(base_size = 12)
 ```
 
-##[TODO]Stacked bar plot
+##Bubble plot by level of education:
+
+###Read in more dependent variables:
+
+```{r}
+G_as_of_Y_Pre_Primary <- read_excel("data/EdStats_Indicators_Report_Pre_Primary.xlsx")
+G_as_of_Y_Primary <- read_excel("data/EdStats_Indicators_Report_Primary.xlsx")
+G_as_of_Y_Secondary <- read_excel("data/EdStats_Indicators_Report_Secondary.xlsx")
+G_as_of_Y_Post_Secondary_Non_Tertiary <- read_excel("data/EdStats_Indicators_Report_Post_Secondary_Non_Tertiary.xlsx")
+G_as_of_Y_Tertiary <- read_excel("data/EdStats_Indicators_Report_Tertiary.xlsx")
+
+G_as_of_Y_Pre_Primary <-
+  G_as_of_Y_Pre_Primary |> 
+  rename(Country = ...1)
+G_as_of_Y_Primary <-
+  G_as_of_Y_Primary |> 
+  rename(Country = ...1)
+G_as_of_Y_Secondary <-
+  G_as_of_Y_Secondary |> 
+  rename(Country = ...1)
+G_as_of_Y_Post_Secondary_Non_Tertiary <-
+  G_as_of_Y_Post_Secondary_Non_Tertiary |> 
+  rename(Country = ...1)
+G_as_of_Y_Tertiary <-
+  G_as_of_Y_Tertiary |> 
+  rename(Country = ...1)
+```
+
+###Pre-Primary as of total:
+
+```{r}
+G_as_of_Y_Pre_Primary_cleaned <-
+  G_as_of_Y_Pre_Primary |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7) |>
+  select(Country, Twenty_fifteen)
+
+d_Pre_Primary <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Pre_Primary_cleaned, by = "Country")
+d_Pre_Primary <-
+  full_join(d_Pre_Primary, G_as_of_Y_cleaned, by = "Country")
+
+d_Pre_Primary |>
+  ggplot(aes(x = Twenty_fifteen.x, y = Twenty_fifteen.y, size = Democracy, color = Democracy)) +
+  geom_point(alpha = 0.7) +
+  scale_size(name = "Democracy\nLevel in Size") +
+  scale_color_viridis_c(option = "F", name = "Democracy\nLevel in Color") +
+  labs(x = "Government Expenditure on Pre-Primary Education as of GDP (%)", y = "Government Expenditure on Education as of GDP (%)", title = "Government Expenditure on Education as of GDP v.s.\nGovernment Expenditure on Pre-Primary Education as of GDP\n(2015)", caption = "Data Source: V-Dem v.13, World Bank") +
+  theme_classic(base_size = 12)
+```
+
+###Primary as of total:
+
+```{r}
+G_as_of_Y_Primary_cleaned <-
+  G_as_of_Y_Primary |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7) |>
+  select(Country, Twenty_fifteen)
+
+d_Primary <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Primary_cleaned, by = "Country")
+d_Primary <-
+  full_join(d_Primary, G_as_of_Y_cleaned, by = "Country")
+
+d_Primary |>
+  ggplot(aes(x = Twenty_fifteen.x, y = Twenty_fifteen.y, size = Democracy, color = Democracy)) +
+  geom_point(alpha = 0.7) +
+  scale_size(name = "Democracy\nLevel in Size") +
+  scale_color_viridis_c(option = "F", name = "Democracy\nLevel in Color") +
+  labs(x = "Government Expenditure on Primary Education as of GDP (%)", y = "Government Expenditure on Education as of GDP (%)", title = "Government Expenditure on Education as of GDP v.s.\nGovernment Expenditure on Primary Education as of GDP\n(2015)", caption = "Data Source: V-Dem v.13, World Bank") +
+  theme_classic(base_size = 12)
+```
+
+###Secondary as of total:
+
+```{r}
+G_as_of_Y_Secondary_cleaned <-
+  G_as_of_Y_Secondary |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7) |>
+  select(Country, Twenty_fifteen)
+
+d_Secondary <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Secondary_cleaned, by = "Country")
+d_Secondary <-
+  full_join(d_Secondary, G_as_of_Y_cleaned, by = "Country")
+
+d_Secondary |>
+  ggplot(aes(x = Twenty_fifteen.x, y = Twenty_fifteen.y, size = Democracy, color = Democracy)) +
+  geom_point(alpha = 0.7) +
+  scale_size(name = "Democracy\nLevel in Size") +
+  scale_color_viridis_c(option = "F", name = "Democracy\nLevel in Color") +
+  labs(x = "Government Expenditure on Secondary Education as of GDP (%)", y = "Government Expenditure on Education as of GDP (%)", title = "Government Expenditure on Education as of GDP v.s.\nGovernment Expenditure on Secondary Education as of GDP\n(2015)", caption = "Data Source: V-Dem v.13, World Bank") +
+  theme_classic(base_size = 12)
+```
+
+###Post-Secondary Non-Tertiary as of total:
+
+```{r}
+G_as_of_Y_Post_Secondary_Non_Tertiary_cleaned <-
+  G_as_of_Y_Post_Secondary_Non_Tertiary |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7) |>
+  select(Country, Twenty_fifteen)
+
+d_Post_Secondary_Non_Tertiary <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Post_Secondary_Non_Tertiary_cleaned, by = "Country")
+d_Post_Secondary_Non_Tertiary <-
+  full_join(d_Post_Secondary_Non_Tertiary, G_as_of_Y_cleaned, by = "Country")
+
+d_Post_Secondary_Non_Tertiary |>
+  ggplot(aes(x = Twenty_fifteen.x, y = Twenty_fifteen.y, size = Democracy, color = Democracy)) +
+  geom_point(alpha = 0.7) +
+  scale_size(name = "Democracy\nLevel in Size") +
+  scale_color_viridis_c(option = "F", name = "Democracy\nLevel in Color") +
+  labs(x = "Government Expenditure on Post-Secondary Non-Tertiary Education as of GDP (%)", y = "Government Expenditure on Education as of GDP (%)", title = "Government Expenditure on Education as of GDP v.s.\nGovernment Expenditure on Post-Secondary Non-Tertiary Education as of GDP\n(2015)", caption = "Data Source: V-Dem v.13, World Bank") +
+  theme_classic(base_size = 12)
+```
+
+###Tertiary as of total:
+
+```{r}
+G_as_of_Y_Tertiary_cleaned <-
+  G_as_of_Y_Tertiary |>
+  select(Country, 3, 4, 5, 6, 7, 8) |>
+  rename(Twenty_fourteen = 2, Twenty_fifteen = 3, Twenty_sixteen = 4, Twenty_seventeen = 5, Twenty_eighteen = 6, Twenty_nineteen = 7) |>
+  select(Country, Twenty_fifteen)
+
+d_Tertiary <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Tertiary_cleaned, by = "Country")
+d_Tertiary <-
+  full_join(d_Tertiary, G_as_of_Y_cleaned, by = "Country")
+
+d_Tertiary |>
+  ggplot(aes(x = Twenty_fifteen.x, y = Twenty_fifteen.y, size = Democracy, color = Democracy)) +
+  geom_point(alpha = 0.7) +
+  scale_size(name = "Democracy\nLevel in Size") +
+  scale_color_viridis_c(option = "F", name = "Democracy\nLevel in Color") +
+  labs(x = "Government Expenditure on Tertiary Education as of GDP (%)", y = "Government Expenditure on Education as of GDP (%)", title = "Government Expenditure on Education as of GDP v.s.\nGovernment Expenditure on Pre-Primary Education as of GDP\n(2015)", caption = "Data Source: V-Dem v.13, World Bank") +
+  theme_classic(base_size = 12)
+```
+
+##Stack bar plot by level:
+
+```{r}
+d_stack <-
+  full_join(Dem_index_cleaned_bubble, G_as_of_Y_Pre_Primary_cleaned, by = "Country")
+d_stack <-
+  full_join(d_stack, G_as_of_Y_Primary_cleaned, by = "Country")
+d_stack <-
+  full_join(d_stack, G_as_of_Y_Secondary_cleaned, by = "Country")
+d_stack <-
+  full_join(d_stack, G_as_of_Y_Post_Secondary_Non_Tertiary_cleaned, by = "Country")
+d_stack <-
+  full_join(d_stack, G_as_of_Y_Tertiary_cleaned, by = "Country") |>
+  rename(Pre_Primary_1 = Twenty_fifteen.x, Primary_1 = Twenty_fifteen.y, Secondary_1 = Twenty_fifteen.x.x, Post_S_Non_T_1 = Twenty_fifteen.y.y, Tertiary_1 = Twenty_fifteen)
+
+d_stack <-
+  d_stack |>
+  mutate(Pre_Primary = as.numeric(Pre_Primary_1)) |>
+  mutate(Primary = as.numeric(Primary_1)) |>
+  mutate(Secondary = as.numeric(Secondary_1)) |>
+  mutate(Post_S_Non_T = as.numeric(Post_S_Non_T_1)) |>
+  mutate(Tertiary = as.numeric(Tertiary_1)) |>
+  select(Country, Democracy, Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary)
+```
+
+###Top 20 democracy countries:
+
+```{r}
+d_stack_1 <-
+  d_stack |>
+  arrange(-Democracy) |>
+  filter(Democracy >= 0.7794) |>
+  select(Country, Democracy, Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary) |>
+  pivot_longer(
+    cols = c(Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary), 
+    names_to = "Level", 
+    values_to = "Percentage"
+  ) 
+
+d_stack_1 |> 
+  ggplot(aes(y = reorder(Country, Democracy), x = Percentage, fill = Level)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_viridis(discrete = T, option = "plasma", direction = -1) +
+  labs(y = "Country", x = "Percentage", title = "Education Expenditure by Level as of GDP\nfor Top 20 Democracy Countries (2015)", fill = "Level of Education\nas of GDP (%)")  +
+  theme_classic()
+```
+
+###Lowest 20 democracy countries:
+
+```{r}
+d_stack_2 <-
+  d_stack |>
+  arrange(Democracy) |>
+  filter(Democracy <= 0.1062) |>
+  select(Country, Democracy, Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary) |>
+  pivot_longer(
+    cols = c(Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary), 
+    names_to = "Level", 
+    values_to = "Percentage"
+  ) 
+
+d_stack_2 |> 
+  ggplot(aes(y = reorder(Country, -Democracy), x = Percentage, fill = Level)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_viridis(discrete = T, option = "plasma", direction = -1) +
+  labs(y = "Country", x = "Percentage", title = "Education Expenditure by Level as of GDP\nfor Lowest 20 Democracy Countries (2015)", fill = "Level of Education\nas of GDP (%)")  +
+  theme_classic()
+```
+
+###All countries except the last 20:
+
+```{r}
+d_stack_3 <-
+  d_stack |>
+  arrange(Democracy) |>
+  filter(Democracy >= 0.1062) |>
+  select(Country, Democracy, Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary) |>
+  pivot_longer(
+    cols = c(Pre_Primary, Primary, Secondary, Post_S_Non_T, Tertiary), 
+    names_to = "Level", 
+    values_to = "Percentage"
+  ) 
+
+d_stack_3 |> 
+  ggplot(aes(y = reorder(Country, -Democracy), x = Percentage, fill = Level)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_viridis(discrete = T, option = "plasma", direction = -1) +
+  labs(y = "Country", x = "Percentage", title = "Education Expenditure by Level as of GDP\nfor All Countries other than the Last 20 (2015)", fill = "Level of Education\nas of GDP (%)")  +
+  theme_classic(base_size = 3)
+```
+
+###[FURTHER]: All countries except the last 20 (stack bar in a circle):
+
+```{r}
+#d_stack_3 |>
+#  ggplot(aes(y = reorder(Country, -Democracy), x = Percentage, fill = Level)) +
+#  geom_bar(stat = "identity") +
+#  scale_fill_viridis(discrete = TRUE, option = "plasma", direction = -1) +
+#  coord_polar() 
+```
